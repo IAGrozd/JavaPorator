@@ -102,6 +102,7 @@ class TokenType(Enum):
 
     # Special
     IDENTIFIER = auto()   # variable names, class names, method names
+    COMMENT = auto() # coment signs (// and /* */)
     EOF = auto()   # end of file
 
 
