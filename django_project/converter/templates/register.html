@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация - JavaPorator</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Регистрация</h1>
+    <p class="subtitle">Създайте нов профил, за да използвате JavaPorator.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+        
+        <button type="submit">Регистрирай се</button>
+    </form>
+    
+    <p style="margin-top: 15px; font-size: 14px;">
+        Вече имате профил? <a href="{% url 'login' %}">Влезте оттук</a>
+    </p>
+</div>
+
+</body>
+</html>

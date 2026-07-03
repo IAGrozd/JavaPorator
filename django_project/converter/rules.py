@@ -120,7 +120,6 @@ RULES: list[Rule] = [
     ),
 
     # CLASSES
-    # 4. CLASSES
     Rule(
         pattern=rf'(?:\b(?:{ACCESS_MODIFIERS})\s+)?(?:abstract\s+)?class\s+(\w+)\s+extends\s+(\w+)',
         replacement=r'class \1(\2):',
@@ -151,6 +150,10 @@ RULES: list[Rule] = [
 
     # STANDARD LIBRARY
     Rule(
+        pattern=r'System\.out\.println\(([^"]*"[^"]*")\s*\+\s*([a-zA-S0-9_]+)\);',
+        replacement=r'print(\1, \2)'
+    ),
+    Rule(
         pattern=r'System\.out\.println\((.*?)\)\s*;?',
         replacement=r'print(\1)',
         description='print()'
@@ -174,6 +177,11 @@ RULES: list[Rule] = [
         pattern=r'\b([\w.\[\]]+)\.size\(\)',
         replacement=r'len(\1)',
         description='len(obj)'
+    ),
+    Rule(
+        pattern=rf'({BASE_TYPES})\[\]\s+(\w+)\s*=\s*{{([^}}]+)}};',
+        replacement=r'\2 = [\3]',
+        description='Arrays to lists'
     ),
 
     # DETYPIFICATION
@@ -237,3 +245,8 @@ RULES: list[Rule] = [
         replacement=r''
     ),
 ]
+
+def apply_rules(code: str) -> str:
+    for rule in RULES:
+        code = re.sub(rule.pattern, rule.replacement, code, flags=re.MULTILINE)
+    return code

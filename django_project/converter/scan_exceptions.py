@@ -1,5 +1,3 @@
-import Exception
-
 class ConversionError(Exception):
     def __init__(self, msg="Възникна грешка при конвертирането на кода."):
         super().__init__(msg)

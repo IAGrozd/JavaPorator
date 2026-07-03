@@ -1,4 +1,5 @@
 import re
+from scan_exceptions import JavaSyntaxError
 
 class JavaScanner:
     def __init__(self):
@@ -23,7 +24,7 @@ class JavaScanner:
                 if var_name and var_name.isidentifier():
                     self.class_vars.add(var_name)
                 elif not var_name.isidentifier():
-                    raise ValueError(f"Invalid variable name detected: '{var_name}' in line: '{line}'")
+                    raise JavaSyntaxError(f"Invalid variable name detected: '{var_name}' in line: '{line}'")
             
             identation_level += open_braces - close_braces
 
@@ -49,7 +50,7 @@ class JavaScanner:
             if local_scopes:
                 local_scopes.pop()
             else:
-                raise ValueError("Unmatched closing brace '}' detected in the code.")
+                raise JavaSyntaxError("Unmatched closing brace '}' detected in the code.")
 
     def _collect_current_locals(self, local_scopes: list[set]) -> set:
         """Make a set from all variables that are seen in the current scope"""
@@ -80,7 +81,7 @@ class JavaScanner:
                 if var_name.isidentifier():
                     new_locals.add(var_name)
                 else:
-                    raise ValueError(f"Invalid variable name detected: '{var_name}' in line: '{original_line}'")            
+                    raise JavaSyntaxError(f"Invalid variable name detected: '{var_name}' in line: '{original_line}'")            
         return new_locals
 
     def _transform_variables(self, clean_line: str, inside_method: bool, current_locals: set, new_locals: set) -> str:

@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaPorator - Java to Python Translator</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+<div class="container">
+    <div class="user-profile">
+        <span>Потребител: <strong>{{ user.username }}</strong></span>
+        <a href="{% url 'logout' %}" class="logout-btn">Изход</a>
+    </div>
+
+    <h1>JavaPorator</h1>
+    <p class="subtitle">Качи своите .java файлове и ги транспилирай в чист Python код за секунди.</p>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="dropzone">
+            <input type="file" name="java_files" accept=".java" multiple required>
+        </div>
+        <button type="submit">Преведи и Изтегли (.ZIP)</button>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: #f8d7da; color: #721c24; padding: 10px; margin-top: 20px; border: 1px solid #f5c6cb; font-size: 14px; text-align: left;">
+                <strong>Възникна проблем:</strong> {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+</body>
+</html>

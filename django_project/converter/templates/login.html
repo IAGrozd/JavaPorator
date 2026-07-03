@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход - JavaPorator</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Вход в системата</h1>
+    <p class="subtitle">Моля, въведете потребителско име и парола, за да използвате конвертора.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+        
+        <button type="submit">Влез</button>
+    </form>
+    
+    <p style="margin-top: 15px; font-size: 14px;">
+        Нямате профил? <a href="{% url 'register' %}">Регистрирайте се оттук</a>
+    </p>
+</div>
+
+</body>
+</html>

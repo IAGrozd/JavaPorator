@@ -1,0 +1,70 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 40px;
+}
+
+.container {
+    background: #ffffff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.user-profile {
+    background: #e1e1e1;
+    padding: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    overflow: hidden; /* за изчистване на float */
+}
+
+.user-profile span {
+    float: left;
+}
+
+.logout-btn {
+    float: right;
+    color: red;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.dropzone {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #fafafa;
+    border: 1px solid #ccc;
+}
+
+input[type="file"] {
+    display: block;
+    width: 100%;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: 1px solid #0056b3;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background: #0056b3;
+}
