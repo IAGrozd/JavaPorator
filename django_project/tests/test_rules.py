@@ -1,7 +1,11 @@
+import sys
+import os
 import unittest
 import re
-from converter.rules import RULES
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from converter.rules import RULES
 
 class TestJavaToPythonRules(unittest.TestCase):
 
@@ -54,7 +58,7 @@ class TestJavaToPythonRules(unittest.TestCase):
 
     # METHODS AND INITIALIZERS
     def test_method_declaration(self):
-        self.assertEqual(self.apply_rules('public void sampleMethod(int a)').strip(), 'def sampleMethod(a):')
+        self.assertEqual(self.apply_rules('public void sampleMethod(int a)').strip(), 'def sampleMethod(self, a):')
 
     def test_constructor_init(self):
         self.assertEqual(self.apply_rules('public Player(String name)').strip(), 'def __init__(self, name):')

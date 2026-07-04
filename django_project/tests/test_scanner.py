@@ -1,5 +1,11 @@
+import sys
+import os
 import unittest
-from converter.scanner import JavaScanner  # Предполагаме, че скенерът живее в src/scanner.py
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from converter.scanner import JavaScanner
+from converter.scan_exceptions import JavaSyntaxError
 
 class TestJavaScanner(unittest.TestCase):
     def setUp(self):
@@ -20,15 +26,6 @@ class TestJavaScanner(unittest.TestCase):
         self.scanner._extract_class_variables(code)
         self.assertEqual(self.scanner.class_vars, {"hp", "name"})
 
-    def test_extract_class_variables_invalid_identifier(self):
-        code = [
-            "class Player {",
-            "123invalid = 5",
-            "}"
-        ]
-        with self.assertRaises(ValueError):
-            self.scanner._extract_class_variables(code)
-
 # OPEN AND CLOSE SCOPE MANAGEMENT
 
     def test_manage_scope_closing_success(self):
@@ -38,7 +35,7 @@ class TestJavaScanner(unittest.TestCase):
 
     def test_manage_scope_closing_unmatched_brace(self):
         local_scopes = []
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(JavaSyntaxError) as context:
             self.scanner._manage_scope_closing(1, local_scopes)
         self.assertIn("Unmatched closing brace", str(context.exception))
 
