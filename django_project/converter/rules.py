@@ -144,14 +144,18 @@ RULES: list[Rule] = [
     ),
     Rule(
         pattern=rf'(?:\b(?!(?:class|new|return|in|for|if|else|elif|while|def)\b)(?:{BASE_TYPES}|[\w<>\[\]]+)\s+)(\w+)\s*\((.*?)\)',
-        replacement=r'def \1(\2):',
+        replacement=r'def \1(self, \2):',
         description='Method declaration'
     ),
 
     # STANDARD LIBRARY
     Rule(
-        pattern=r'System\.out\.println\(([^"]*"[^"]*")\s*\+\s*([a-zA-S0-9_]+)\);',
+        pattern=r'System\.out\.println\(([^"]*"[^"]*")\s*\+\s*([a-zA-Z0-9_]+)\);',
         replacement=r'print(\1, \2)'
+    ),
+    Rule(
+        pattern=r'System\.out\.print\((.*?)\s*\+\s*"(.*?)"\)\s*;?',
+        replacement=r'print(\1, "\2", end="")',
     ),
     Rule(
         pattern=r'System\.out\.println\((.*?)\)\s*;?',

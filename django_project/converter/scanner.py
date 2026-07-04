@@ -1,32 +1,30 @@
 import re
-from scan_exceptions import JavaSyntaxError
+from .scan_exceptions import JavaSyntaxError
 
 class JavaScanner:
     def __init__(self):
         self.class_vars = set()
 
+    def _is_field_definition(self, line: str, indentation_depth: int) -> bool:
+        return False if indentation_depth != 1 else bool(re.match(r'^\s*self\.[a-zA-Z_][a-zA-Z0-9_]*(\s*=\s*.*)?\s*$', line))
+
     def _extract_class_variables(self, lines: list[str]):
         """Scan the code and extract all member-variables of the class."""
         self.class_vars.clear()
         identation_level = 0
-        
         for line in lines:
             line = line.strip()
-            open_braces = line.count('{')
-            close_braces = line.count('}')
-            
             if identation_level == 1 and not line.startswith(('def ', 'class ', 'if ', 'for ', 'while ', 'elif ', 'else ', '{', '}')):
                 if '=' in line:
+
                     var_name = line.split('=')[0].strip()
                 else:
+
                     var_name = line.strip()
-                
                 if var_name and var_name.isidentifier():
+
                     self.class_vars.add(var_name)
-                elif not var_name.isidentifier():
-                    raise JavaSyntaxError(f"Invalid variable name detected: '{var_name}' in line: '{line}'")
-            
-            identation_level += open_braces - close_braces
+            identation_level += line.count('{') - line.count('}')
 
     def _replace_field_callback(self, match, processed_line: str, current_locals: set, new_locals: set) -> str:
         """Checks if a given word should receive the 'self.' prefix."""
@@ -60,28 +58,40 @@ class JavaScanner:
         return current_locals
 
     def _extract_new_locals(self, clean_line: str, inside_method: bool, original_line: str) -> set:
-        """Finds new local variables at the current line"""
         new_locals = set()
-        
-        if clean_line.startswith('def '):
-            match = re.search(r'def \w+\((.*?)\):', clean_line)
+
+        if any(char in clean_line for char in ['"', "'"]) or 'print' in clean_line:
+            return set()
+
+        if clean_line.startswith(('if ', 'while ', 'elif ', 'else:')):
+            return set()
+
+        if clean_line.startswith('for '):
+            match = re.search(r'for\s*\(\w+\s+(\w+)', clean_line)
             if match:
-                params = match.group(1).split(',')
-                for p in params:
+                new_locals.add(match.group(1))
+            return new_locals
+        elif clean_line.startswith('def '):
+            match = re.search(r'def [\w\_]+\((.*?)\):', clean_line)
+            if match:
+                for p in match.group(1).split(','):
                     p = p.strip()
                     if p and p != 'self':
                         new_locals.add(p)
-        elif '=' in clean_line and not clean_line.startswith(('if ', 'for ', 'while ', 'elif ')):
+        elif '=' in clean_line:
             if inside_method:
-                if any(op + '=' in clean_line for op in ['+', '-', '*', '/', '%', '&', '|', '^', '<', '>', '!', '=']):
-                    return new_locals
+                if any(op + '=' in clean_line for op in ['+', '-', '*', '/', '%', '&', '|', '^', '<', '>', '!']):
+                    return set()
+                
                 var_name = clean_line.split('=')[0].strip()
-                if '.' in var_name:
-                    return new_locals
+                
+                if '.' in var_name or var_name in ['in', 'for', 'while', 'if']:
+                    return set()
+                    
                 if var_name.isidentifier():
                     new_locals.add(var_name)
                 else:
-                    raise JavaSyntaxError(f"Invalid variable name detected: '{var_name}' in line: '{original_line}'")            
+                    return set()        
         return new_locals
 
     def _transform_variables(self, clean_line: str, inside_method: bool, current_locals: set, new_locals: set) -> str:
@@ -136,12 +146,12 @@ class JavaScanner:
             new_locals = self._extract_new_locals(clean_no_braces, inside_method, line)
             
             # Transform the variables (this. -> self. and add self. to class vars)
-            processed_line = self._transform_variables(clean_no_braces, inside_method, current_locals, new_locals)
+            line = self._transform_variables(clean_no_braces, inside_method, current_locals, new_locals)
 
             # Put the necessary identation
-            final_line = self._compute_indentation(processed_line, local_scopes)
-            if final_line:
-                output_lines.append(final_line)
+            line = self._compute_indentation(line, local_scopes)
+            if line and not self._is_field_definition(line, len(local_scopes)):
+                output_lines.append(line)
 
             # Take care for opening a new scope
             self._manage_scope_opening(open_count, local_scopes, new_locals)

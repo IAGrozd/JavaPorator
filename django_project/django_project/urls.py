@@ -9,10 +9,7 @@ def custom_logout(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
     path('', include('converter.urls')),
-    
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    
     path('logout/', custom_logout, name='logout')
 ]
