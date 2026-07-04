@@ -14,23 +14,29 @@ def converter_home(request):
     if request.method == 'POST' and request.FILES.getlist('java_files'):
         java_files = request.FILES.getlist('java_files')
         
+        # Creates "virtual file" in RAM
         zip_buffer = io.BytesIO()
         scanner = JavaScanner()
         try:
+            # Opens new zip archive for writing
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
                 for file in java_files:
+                    # Read in byte format and decode to string
                     java_code = file.read().decode('utf-8')
                     
                     python_code = scanner.transform(apply_rules(java_code))
                     
+                    # Rename the file
                     new_filename = file.name.replace('.java', '.py')
                     if not new_filename.endswith('.py'):
                         new_filename += '.py'
                     
+                    # Save the file into the zip archive
                     zip_file.writestr(new_filename, python_code)
             
             zip_buffer.seek(0)
             response = HttpResponse(zip_buffer.getvalue(), content_type='application/zip')
+            # Give instructions to the browser to download the file
             response['Content-Disposition'] = 'attachment; filename="translated_python_files.zip"'
             
             return response
